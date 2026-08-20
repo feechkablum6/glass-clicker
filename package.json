@@ -1,7 +1,7 @@
 {
   "name": "glass-clicker",
-  "version": "1.0.0",
-  "description": "Автокликер для Windows со стеклянным интерфейсом: горячая клавиша, скорость и режим работы",
+  "version": "1.1.0",
+  "description": "Autoclicker for Windows with a glass interface: hotkey, speed, click mode, English and Russian",
   "main": "main.js",
   "author": "AKASHI",
   "license": "MIT",

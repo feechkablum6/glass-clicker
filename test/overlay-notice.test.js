@@ -9,9 +9,9 @@ function state(patch = {}) {
 }
 
 // Управляемое время: итог захода считается от момента запуска.
-function createSource() {
+function createSource(language = 'ru') {
     let clock = 0;
-    const notices = createNoticeSource({ now: () => clock });
+    const notices = createNoticeSource({ now: () => clock, language });
     return { notices, tick: ms => { clock += ms; } };
 }
 
@@ -99,4 +99,45 @@ test('сжатая плашка показывает скорость и кли�
     notices.update(state({ running: true, clicks: 40, cps: 25 }));
 
     assert.equal(notices.progress(state({ running: true, clicks: 1287, cps: 25 })), '25 кл/с · 1 247');
+});
+
+test('на английском языке плашка говорит по-английски', () => {
+    const { notices, tick } = createSource('en');
+    notices.update(state());
+
+    const start = notices.update(state({ running: true, cps: 40, button: 'right' }));
+    assert.equal(start.title, 'Autoclicker on');
+    assert.equal(start.detail, '40 cps, right button');
+    assert.equal(start.pill, '40 cps · 0');
+
+    assert.equal(notices.progress(state({ running: true, clicks: 1247, cps: 40 })), '40 cps · 1,247');
+
+    tick(26_400);
+    const stop = notices.update(state({ running: false, clicks: 312 }));
+    assert.equal(stop.title, 'Autoclicker off');
+    assert.equal(stop.detail, '312 clicks in 26 s');
+});
+
+test('английский итог знает единственное число и минуты', () => {
+    const { notices, tick } = createSource('en');
+    notices.update(state());
+    notices.update(state({ running: true }));
+
+    tick(126_000);
+    assert.equal(notices.update(state({ running: false, clicks: 1 })).detail, '1 click in 2 min 6 s');
+
+    notices.update(state({ running: true, clicks: 1 }));
+    assert.equal(notices.update(state({ running: false, clicks: 1 })).detail, 'No clicks');
+});
+
+test('смена языка на ходу не сбивает счёт текущего захода', () => {
+    const { notices, tick } = createSource('en');
+    notices.update(state({ clicks: 100 }));
+    notices.update(state({ running: true, clicks: 100 }));
+
+    notices.setLanguage('ru');
+    assert.equal(notices.progress(state({ running: true, clicks: 400, cps: 12 })), '12 кл/с · 300');
+
+    tick(5000);
+    assert.equal(notices.update(state({ running: false, clicks: 400 })).detail, '300 кликов за 5 с');
 });

@@ -14,7 +14,8 @@
 - `lib/win32.js`: every Win32 call, wrapped so the rest of the code stays testable.
 - `lib/click-engine.js`: click scheduling and hotkey modes, pure logic with injected timers.
 - `lib/overlay-notice.js`: what the on-top notice says when the clicker starts and stops, pure logic.
-- `lib/keys.js`: virtual key codes, Russian labels, capture whitelist.
+- `lib/i18n.js`: every user-facing string in English and Russian, plus number grouping and plural forms.
+- `lib/keys.js`: virtual key codes, translated labels, capture whitelist.
 - `lib/settings.js`: validated settings with debounced writes to `userData`.
 - `renderer/`: the main window (`index.html`, `styles.css`, `renderer.js`) and the notice shown over other apps (`overlay.*`); `tokens.css` holds the design tokens both share.
 - `test/`: unit tests for the engine, notices, settings, and key labels.
@@ -29,7 +30,8 @@
 
 - Keep Windows-native calls behind `lib/win32.js`; the rest of the code receives plain functions.
 - Add behavior with a failing `node:test` case before production code.
-- Keep user-facing strings in Russian; keep code and comments as they are in each file.
+- Every user-facing string lives in `lib/i18n.js` in both languages; keep code and comments as they are in each file.
+- Static labels in the window carry `data-i18n`, `data-i18n-title` or `data-i18n-aria`; dynamic text goes through `t()` in `renderer.js`.
 - Glass look comes from the system acrylic backdrop plus a light CSS layer; the CSS layer alone must stay readable, since the backdrop can be off.
 
 ## Anti-patterns
@@ -51,3 +53,7 @@
 - DO NOT trust the notice renderer alone to close its window; main keeps a fallback timer, or a stalled renderer leaves a card floating over everything.
 - DO NOT emit the running state after the first click; the notice counts the clicks of one session from the counter it saw at start.
 - DO NOT copy design tokens into a second stylesheet; both windows read `renderer/tokens.css`, so the notice can never drift from the main window.
+- DO NOT hardcode a visible string anywhere outside `lib/i18n.js`, and do not keep a second copy of the dictionary in the renderer: the window receives it from main with the state, so one language can never lag behind.
+- DO NOT ship the dictionary with every state update; it travels only on `state:get` and on a language change, while the fast path stays small.
+- DO NOT recreate the notice source when the language changes; `setLanguage()` keeps the running session, its start time and its click count.
+- DO NOT treat a missing language in settings as English: `null` means the first run, and the window asks the question before anything else.

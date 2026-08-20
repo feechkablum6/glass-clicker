@@ -53,25 +53,48 @@ test('чужие значения в настройках заменяются �
     assert.equal(restored.y, 40);
 });
 
-test('кнопки мыши подписаны по-русски без обращения к системе', () => {
-    assert.equal(describeKey(VK.MBUTTON), 'Колесо мыши');
-    assert.equal(describeKey(VK.LBUTTON), 'Левая кнопка мыши');
-    assert.equal(describeKey(VK.XBUTTON2), 'Боковая кнопка 2');
+test('невыбранный язык остаётся пустым, а выбранный сохраняется', () => {
+    assert.equal(DEFAULTS.language, null);
+    assert.equal(normalize({}).language, null);
+    assert.equal(normalize({ language: 'de' }).language, null);
+    assert.equal(normalize({ language: 'ru' }).language, 'ru');
+
+    const store = createSettingsStore(tempDirectory(), { writeDelay: 5 });
+    assert.equal(store.update({ language: 'en' }).language, 'en');
+});
+
+test('кнопки мыши подписаны без обращения к системе', () => {
+    assert.equal(describeKey(VK.MBUTTON, null, 'ru'), 'Колесо мыши');
+    assert.equal(describeKey(VK.LBUTTON, null, 'ru'), 'Левая кнопка мыши');
+    assert.equal(describeKey(VK.XBUTTON2, null, 'ru'), 'Боковая кнопка 2');
+
+    assert.equal(describeKey(VK.MBUTTON, null, 'en'), 'Mouse wheel');
+    assert.equal(describeKey(VK.XBUTTON2, null, 'en'), 'Side button 2');
 });
 
 test('имя клавиши берётся из системной раскладки', () => {
-    assert.equal(describeKey(0x41, () => 'Ф'), 'Клавиша Ф');
-    assert.equal(describeKey(0x70, () => 'F1'), 'F1');
+    assert.equal(describeKey(0x41, () => 'Ф', 'ru'), 'Клавиша Ф');
+    assert.equal(describeKey(0x41, () => 'Ф', 'en'), 'Ф key');
+    assert.equal(describeKey(0x70, () => 'F1', 'ru'), 'F1');
 });
 
 test('кнопки игровых мышей на F13-F24 подписаны, а не показаны кодом', () => {
-    assert.equal(describeKey(0x7c, () => null), 'F13');
-    assert.equal(describeKey(0x87, () => null), 'F24');
+    assert.equal(describeKey(0x7c, () => null, 'ru'), 'F13');
+    assert.equal(describeKey(0x87, () => null, 'en'), 'F24');
 });
 
 test('клавиша без системного имени всё равно получает подпись', () => {
-    assert.equal(describeKey(0x42, () => null), 'Клавиша B');
-    assert.equal(describeKey(0xff, () => null), 'Код 255');
+    assert.equal(describeKey(0x42, () => null, 'ru'), 'Клавиша B');
+    assert.equal(describeKey(0xff, () => null, 'ru'), 'Код 255');
+    assert.equal(describeKey(0x42, () => null, 'en'), 'B key');
+    assert.equal(describeKey(0xff, () => null, 'en'), 'Key code 255');
+});
+
+test('переводимые клавиши меняют подпись вместе с языком', () => {
+    assert.equal(describeKey(0x20, () => null, 'ru'), 'Пробел');
+    assert.equal(describeKey(0x20, () => null, 'en'), 'Space');
+    assert.equal(describeKey(0xa2, () => null, 'ru'), 'Ctrl слева');
+    assert.equal(describeKey(0xa2, () => null, 'en'), 'Left Ctrl');
 });
 
 test('служебные клавиши не попадают в захват бинда', () => {

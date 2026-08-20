@@ -5,6 +5,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('clicker', {
     getState: () => ipcRenderer.invoke('state:get'),
     updateConfig: patch => ipcRenderer.invoke('config:update', patch),
+    setLanguage: value => ipcRenderer.invoke('language:set', value),
     captureBind: () => ipcRenderer.invoke('bind:capture'),
     cancelCapture: () => ipcRenderer.invoke('bind:cancel'),
     toggle: () => ipcRenderer.invoke('clicker:toggle'),

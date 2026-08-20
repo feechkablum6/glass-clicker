@@ -7,6 +7,7 @@ const { ClickEngine } = require('./lib/click-engine');
 const { createSettingsStore } = require('./lib/settings');
 const { createNoticeSource } = require('./lib/overlay-notice');
 const { VK, capturableKeys, describeKey } = require('./lib/keys');
+const { dictionary, isLanguage, normalizeLanguage, translate } = require('./lib/i18n');
 
 const WINDOW = { width: 400, height: 632, radius: 22 };
 // Окно плашки шире самой карточки: в запас уходят тень и разлёт анимации.
@@ -43,10 +44,17 @@ let liveNoticeId = 0;
 let noticeSafetyTimer = null;
 // Код бинда лежит рядом с циклом опроса: читать настройки каждые 6 мс незачем.
 let activeBind = 0;
+// Язык интерфейса. До первого выбора работает язык по умолчанию, а окно
+// показывает вопрос о языке поверх всего остального.
+let language = normalizeLanguage(null);
 
 if (!app.requestSingleInstanceLock()) {
     app.quit();
     return;
+}
+
+function t(key, values) {
+    return translate(language, key, values);
 }
 
 function buttonVirtualKey(button) {
@@ -54,10 +62,12 @@ function buttonVirtualKey(button) {
 }
 
 function bindLabel(code) {
-    return describeKey(code, (key, extended) => win32.readKeyName(key, extended));
+    return describeKey(code, (key, extended) => win32.readKeyName(key, extended), language);
 }
 
-function currentState() {
+// Словарь весит больше всего остального состояния и меняется только при смене
+// языка, поэтому едет к окну не с каждым обновлением.
+function currentState({ withStrings = false } = {}) {
     const stored = settings.get();
     const engineState = engine.getState();
     return {
@@ -65,31 +75,43 @@ function currentState() {
         bind: stored.bind,
         bindLabel: bindLabel(stored.bind),
         capturing: capture !== null,
-        glass: glassApplied
+        glass: glassApplied,
+        language,
+        languageChosen: stored.language !== null,
+        ...(withStrings ? { strings: dictionary(language) } : {})
     };
 }
 
-function pushState() {
+function pushState(options) {
     refreshTray();
     // Скорость видна и на сжатой плашке, поэтому она обновляется вместе с ней.
     pushNoticeProgress();
     if (!mainWindow || mainWindow.isDestroyed()) return;
-    const state = currentState();
+    const state = currentState(options);
     lastSentClicks = state.clicks;
     mainWindow.webContents.send('state', state);
+}
+
+function setLanguage(next) {
+    if (!isLanguage(next)) return;
+
+    language = settings.update({ language: next }).language;
+    // Заход не прерывается сменой языка: источник плашки помнит свой счёт.
+    notices.setLanguage(language);
+    pushState({ withStrings: true });
 }
 
 function refreshTray() {
     if (!tray || tray.isDestroyed()) return;
 
     const { running, cps } = engine.getState();
-    tray.setToolTip(running ? `Кликер работает, ${cps} кл/с` : 'Кликер выключен');
+    tray.setToolTip(running ? t('tray.running', { cps }) : t('tray.idle'));
     tray.setContextMenu(Menu.buildFromTemplate([
-        { label: 'Показать окно', click: showWindow },
+        { label: t('tray.show'), click: showWindow },
         { type: 'separator' },
-        { label: running ? 'Остановить кликер' : 'Запустить кликер', click: () => engine.toggle() },
+        { label: running ? t('tray.stop') : t('tray.start'), click: () => engine.toggle() },
         { type: 'separator' },
-        { label: 'Выход', click: quit }
+        { label: t('tray.quit'), click: quit }
     ]));
 }
 
@@ -187,7 +209,7 @@ function setGlass(enabled) {
     if (!enabled) return;
 
     glassApplied = applied;
-    if (!applied) console.warn('Системное размытие недоступно, окно рисует стекло само.');
+    if (!applied) console.warn('System backdrop is unavailable, the window draws its own glass.');
 }
 
 // Системное размытие перерисовывается медленнее, чем движется курсор, и окно
@@ -312,7 +334,7 @@ function createWindow() {
         resizable: false,
         maximizable: false,
         fullscreenable: false,
-        title: 'Кликер',
+        title: t('app.title'),
         icon: path.join(__dirname, 'build', 'icon.png'),
         show: false,
         webPreferences: {
@@ -340,7 +362,7 @@ function createWindow() {
         });
 
         mainWindow.show();
-        pushState();
+        pushState({ withStrings: true });
     });
 
     // Windows пересоздаёт поверхность окна при сворачивании и смене экрана,
@@ -424,7 +446,12 @@ function createTray() {
 }
 
 function registerIpc() {
-    ipcMain.handle('state:get', () => currentState());
+    ipcMain.handle('state:get', () => currentState({ withStrings: true }));
+
+    ipcMain.handle('language:set', (event, next) => {
+        setLanguage(next);
+        return { ok: true };
+    });
 
     ipcMain.handle('config:update', (event, patch = {}) => {
         if (patch.button && buttonVirtualKey(patch.button) === settings.get().bind) {
@@ -472,7 +499,8 @@ function bootstrap() {
 
     const stored = settings.get();
     activeBind = stored.bind;
-    notices = createNoticeSource();
+    language = normalizeLanguage(stored.language);
+    notices = createNoticeSource({ language });
     engine = new ClickEngine({
         click: button => win32.click(button),
         now: () => Date.now(),
@@ -504,7 +532,7 @@ app.on('second-instance', () => showWindow());
 
 app.whenReady().then(() => {
     if (process.platform !== 'win32') {
-        console.error('Кликер работает только в Windows.');
+        console.error('The clicker only runs on Windows.');
         app.quit();
         return;
     }

@@ -1,77 +1,85 @@
 <div align="center">
 
-# Кликер
+**English** · [Русский](README.ru.md)
 
-Автокликер для Windows со стеклянным окном и плашкой поверх игр.
-Одна горячая клавиша, скорость до 100 кликов в секунду, счёт кликов на виду.
+# Clicker
 
-![Плашка поверх окон: включение, сжатие в пилюлю, итог захода](docs/media/demo.gif)
+An autoclicker for Windows with a glass window and a notice that shows up over your game.
+One hotkey, up to 100 clicks per second, the click count always in sight.
+
+![The notice over other windows: start, shrink into a pill, session result](docs/media/demo.gif)
 
 </div>
 
-## Плашка поверх всех окон
+## The notice over every window
 
-Кликер включают, не сворачивая игру, поэтому он сам сообщает о себе сверху по центру экрана. Плашка не перехватывает мышь и не забирает фокус: клики проходят сквозь неё.
+You turn the clicker on without leaving the game, so it announces itself at the top of the screen. The notice takes neither the mouse nor the focus: clicks pass right through it.
 
-| Включение | Работа | Итог захода |
+| Start | Running | Session result |
 |---|---|---|
-| ![Карточка «Автокликер включён»](docs/media/overlay-wide.png) | ![Пилюля со скоростью и счётом](docs/media/overlay-pill.png) | ![Карточка с итогом захода](docs/media/overlay-result.png) |
-| Карточка называет скорость и кнопку | Через полторы секунды карточка стягивается в пилюлю и считает клики вживую | На выключении пилюля разворачивается с итогом и уходит, сжимаясь |
+| ![The card saying the autoclicker is on](docs/media/overlay-wide.png) | ![The pill with speed and click count](docs/media/overlay-pill.png) | ![The card with the session result](docs/media/overlay-result.png) |
+| The card names the speed and the button | After a second and a half the card shrinks into a pill and counts clicks live | On stop the pill expands with the result, then leaves by shrinking |
 
-## Окно
+## The window
 
-| Выключен | Работает |
+| Stopped | Running |
 |---|---|
-| ![Окно кликера в покое](docs/media/window-idle.png) | ![Окно кликера во время работы](docs/media/window-running.png) |
+| ![The clicker window at rest](docs/media/window-idle.png) | ![The clicker window while it runs](docs/media/window-running.png) |
 
-Стекло — системный акрил Windows 11 плюс собственный слой, поэтому окно остаётся читаемым и там, где акрила нет.
+The glass is the Windows 11 system acrylic plus a layer of its own, so the window stays readable even where acrylic is unavailable.
 
-## Что умеет
+## English and Russian
 
-- Горячая клавиша по умолчанию — колесо мыши: нажали, кликер пошёл, нажали снова, остановился.
-- Режим удержания: кликает, только пока кнопка зажата.
-- Скорость от 1 до 100 кликов в секунду, ползунком, прямо во время работы.
-- Клик левой или правой кнопкой.
-- Любая клавиша или кнопка мыши на роль горячей, включая боковые кнопки игровых мышей.
-- Escape останавливает кликер из любого приложения.
-- Закрытие окна сворачивает кликер в трей, горячая клавиша продолжает работать.
-- Счётчик кликов и настройки сохраняются между запусками.
+<img src="docs/media/window-language.png" alt="The first run asks for the interface language" width="330">
 
-## Скачать
+The first run asks which language to speak, and the answer is remembered. Everything switches together: the window, the notice over your game, the tray menu and the key names. The `EN` / `RU` button in the window header changes the language at any moment, even while the clicker runs.
 
-Готовая сборка для Windows 10 и 11 — на странице [релизов](https://github.com/feechkablum6/glass-clicker/releases/latest):
+## What it does
 
-- `Klicker-Setup-1.0.0.exe` — установщик, ставит кликер и создаёт ярлык на рабочем столе.
-- `Klicker-Portable-1.0.0.exe` — запускается без установки, из любой папки.
+- The default hotkey is the mouse wheel: press once to start, press again to stop.
+- Hold mode: clicks only while the button is held down.
+- Speed from 1 to 100 clicks per second, on a slider, adjustable while running.
+- Clicks with the left or the right mouse button.
+- Any key or mouse button can become the hotkey, including the side buttons of gaming mice.
+- Escape stops the clicker from any application.
+- Closing the window hides the clicker to the tray, and the hotkey keeps working.
+- The click counter and every setting survive a restart.
 
-Сборка не подписана сертификатом, поэтому при первом запуске Windows покажет синее окно SmartScreen: «Подробнее» → «Выполнить в любом случае».
+## Download
 
-## Запуск из исходников
+A ready build for Windows 10 and 11 is on the [releases page](https://github.com/feechkablum6/glass-clicker/releases/latest):
 
-Нужны Windows 10 или 11 и Node.js 20+.
+- `Klicker-Setup-1.1.0.exe` installs the clicker and puts a shortcut on the desktop.
+- `Klicker-Portable-1.1.0.exe` runs from any folder, no installation needed.
+
+The build carries no code signing certificate, so the first launch shows the blue SmartScreen window: pick "More info", then "Run anyway".
+
+## Run from source
+
+Windows 10 or 11 and Node.js 20+ are all you need.
 
 ```bash
 npm install
 npm start
 ```
 
-Сборка установщика и переносимой версии:
+Build the installer and the portable executable:
 
 ```bash
 npm run build
 ```
 
-## Как устроено
+## How it works
 
-- Electron 43 — два окна: настройки и плашка поверх всех окон (без рамки, прозрачная, сквозная для мыши).
-- [koffi](https://github.com/Koromix/koffi) — прямые вызовы Win32: `SendInput` для кликов, `GetAsyncKeyState` для горячей клавиши, акрил и скругление углов, повышение точности таймера на время работы.
-- Расписание кликов держит заданный темп и не «догоняет» пропущенное после подвисания системы, поэтому залпа кликов не бывает.
-- Логика вынесена из Electron в `lib/`, поэтому покрыта обычными тестами.
+- Electron 43 with two windows: the settings window and the notice over everything else (frameless, transparent, click-through).
+- [koffi](https://github.com/Koromix/koffi) calls Win32 directly: `SendInput` for clicks, `GetAsyncKeyState` for the hotkey, acrylic and rounded corners, a finer timer resolution while clicking.
+- The click schedule keeps the requested pace and never catches up on clicks missed while the system stalled, so there is no burst afterwards.
+- The logic lives in `lib/`, outside Electron, which is why plain tests cover it.
 
 ```bash
 npm test
 ```
 
-## Лицензия
+## License
 
 [MIT](LICENSE)

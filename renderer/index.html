@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:">
-    <title>Кликер</title>
+    <title>Clicker</title>
     <link rel="stylesheet" href="tokens.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,14 +20,18 @@
                     <path d="M12 12l8.5 2.9-3.8 1.8-1.8 3.8z"></path>
                 </svg>
             </span>
-            <h1 class="title">Кликер</h1>
+            <h1 class="title" data-i18n="app.title">Clicker</h1>
             <div class="window-actions">
-                <button class="icon-button" id="minimize" type="button" title="Свернуть" aria-label="Свернуть окно">
+                <button class="icon-button lang-button" id="language" type="button"
+                        data-i18n-title="language.title" data-i18n-aria="language.title">EN</button>
+                <button class="icon-button" id="minimize" type="button"
+                        data-i18n-title="window.minimize" data-i18n-aria="window.minimize">
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
                         <path d="M4 8.5h8"></path>
                     </svg>
                 </button>
-                <button class="icon-button danger" id="close" type="button" title="Свернуть в трей" aria-label="Свернуть кликер в трей">
+                <button class="icon-button danger" id="close" type="button"
+                        data-i18n-title="window.hide" data-i18n-aria="window.hide">
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
                         <path d="M4.5 4.5l7 7M11.5 4.5l-7 7"></path>
                     </svg>
@@ -49,60 +53,92 @@
                     </svg>
                 </span>
             </button>
-            <p class="stage-status" id="status" role="status">Выключен</p>
-            <p class="stage-hint" id="hint">Колесо мыши включает и выключает</p>
+            <p class="stage-status" id="status" role="status">Stopped</p>
+            <p class="stage-hint" id="hint"></p>
         </section>
 
         <section class="control">
             <div class="control-head">
-                <h2 class="control-title">Скорость</h2>
-                <p class="readout"><span id="cps-value">12</span><span class="readout-unit">кл/с</span></p>
+                <h2 class="control-title" data-i18n="speed.title">Speed</h2>
+                <p class="readout"><span id="cps-value">12</span><span class="readout-unit" data-i18n="speed.unit">cps</span></p>
             </div>
             <input class="slider" id="cps" type="range" min="1" max="100" step="1" value="12"
-                   aria-label="Кликов в секунду">
+                   data-i18n-aria="speed.title">
             <div class="slider-scale" aria-hidden="true">
                 <span style="--at: 0">1</span>
                 <span style="--at: 0.2424">25</span>
                 <span style="--at: 0.4949">50</span>
                 <span style="--at: 1">100</span>
             </div>
-            <p class="control-note" id="interval-note">Пауза между кликами 83 мс</p>
+            <p class="control-note" id="interval-note"></p>
         </section>
 
         <div class="control-pair">
             <section class="control">
-                <h2 class="control-title">Кнопка</h2>
-                <div class="segment" id="button-segment" role="group" aria-label="Какой кнопкой кликать">
+                <h2 class="control-title" data-i18n="button.title">Button</h2>
+                <div class="segment" id="button-segment" role="group" data-i18n-aria="button.title">
                     <span class="segment-thumb" aria-hidden="true"></span>
-                    <button type="button" data-value="left" aria-pressed="true">Левая</button>
-                    <button type="button" data-value="right" aria-pressed="false">Правая</button>
+                    <button type="button" data-value="left" data-i18n="button.left" aria-pressed="true">Left</button>
+                    <button type="button" data-value="right" data-i18n="button.right" aria-pressed="false">Right</button>
                 </div>
             </section>
 
             <section class="control">
-                <h2 class="control-title">Режим</h2>
-                <div class="segment" id="mode-segment" role="group" aria-label="Как работает горячая клавиша">
+                <h2 class="control-title" data-i18n="mode.title">Mode</h2>
+                <div class="segment" id="mode-segment" role="group" data-i18n-aria="mode.title">
                     <span class="segment-thumb" aria-hidden="true"></span>
-                    <button type="button" data-value="toggle" aria-pressed="true">Вкл/выкл</button>
-                    <button type="button" data-value="hold" aria-pressed="false">Удержание</button>
+                    <button type="button" data-value="toggle" data-i18n="mode.toggle" aria-pressed="true">Toggle</button>
+                    <button type="button" data-value="hold" data-i18n="mode.hold" aria-pressed="false">Hold</button>
                 </div>
             </section>
         </div>
 
         <section class="control">
-            <h2 class="control-title">Горячая клавиша</h2>
+            <h2 class="control-title" data-i18n="bind.title">Hotkey</h2>
             <button class="bind" id="bind" type="button">
-                <span class="bind-name" id="bind-name">Колесо мыши</span>
-                <span class="bind-action" id="bind-action">Изменить</span>
+                <span class="bind-name" id="bind-name"></span>
+                <span class="bind-action" id="bind-action"></span>
             </button>
-            <p class="control-note" id="bind-note">Escape останавливает кликер из любого приложения</p>
+            <p class="control-note" id="bind-note"></p>
         </section>
 
         <footer class="footer">
-            <p class="counter">Кликов <span id="clicks">0</span></p>
-            <button class="text-button" id="reset" type="button">Сбросить счёт</button>
+            <p class="counter"><span data-i18n="counter.label">Clicks</span> <span id="clicks">0</span></p>
+            <button class="text-button" id="reset" type="button" data-i18n="counter.reset">Reset count</button>
         </footer>
     </main>
+
+    <!-- Первый запуск: пока язык не выбран, окном пользоваться нельзя, поэтому
+         вопрос двуязычный и стоит поверх всего. -->
+    <div class="welcome" id="welcome" hidden>
+        <div class="welcome-card">
+            <span class="welcome-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path class="spark spark-a" d="M3.6 12h2.3"></path>
+                    <path class="spark spark-b" d="M12 3.6v2.3"></path>
+                    <path class="spark spark-a" d="M6.1 6.1l1.6 1.6"></path>
+                    <path class="spark spark-b" d="M17.9 6.1l-1.6 1.6"></path>
+                    <path class="spark spark-a" d="M6.1 17.9l1.6-1.6"></path>
+                    <path d="M12 12l8.8 3-3.9 1.9-1.9 3.9z"></path>
+                </svg>
+            </span>
+            <h2 class="welcome-title">Choose language</h2>
+            <p class="welcome-sub">Выберите язык</p>
+
+            <div class="welcome-choices">
+                <button class="choice" type="button" data-language="en">
+                    <span class="choice-name">English</span>
+                    <span class="choice-code">EN</span>
+                </button>
+                <button class="choice" type="button" data-language="ru">
+                    <span class="choice-name">Русский</span>
+                    <span class="choice-code">RU</span>
+                </button>
+            </div>
+
+            <p class="welcome-note">Change it any time · Сменить можно в любой момент</p>
+        </div>
+    </div>
 
     <script src="renderer.js"></script>
 </body>
