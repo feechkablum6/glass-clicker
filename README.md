@@ -7,7 +7,7 @@
 An autoclicker for Windows with a glass window and a notice that shows up over your game.
 One hotkey, up to 100 clicks per second, the click count always in sight.
 
-![The notice over other windows: start, shrink into a pill, session result](docs/media/demo.gif)
+![The notice over other windows: start, shrink into a pill, session result](docs/media/en/demo.gif)
 
 </div>
 
@@ -17,20 +17,20 @@ You turn the clicker on without leaving the game, so it announces itself at the 
 
 | Start | Running | Session result |
 |---|---|---|
-| ![The card saying the autoclicker is on](docs/media/overlay-wide.png) | ![The pill with speed and click count](docs/media/overlay-pill.png) | ![The card with the session result](docs/media/overlay-result.png) |
+| ![The card saying the autoclicker is on](docs/media/en/overlay-wide.png) | ![The pill with speed and click count](docs/media/en/overlay-pill.png) | ![The card with the session result](docs/media/en/overlay-result.png) |
 | The card names the speed and the button | After a second and a half the card shrinks into a pill and counts clicks live | On stop the pill expands with the result, then leaves by shrinking |
 
 ## The window
 
 | Stopped | Running |
 |---|---|
-| ![The clicker window at rest](docs/media/window-idle.png) | ![The clicker window while it runs](docs/media/window-running.png) |
+| ![The clicker window at rest](docs/media/en/window-idle.png) | ![The clicker window while it runs](docs/media/en/window-running.png) |
 
 The glass is the Windows 11 system acrylic plus a layer of its own, so the window stays readable even where acrylic is unavailable.
 
 ## English and Russian
 
-<img src="docs/media/window-language.png" alt="The first run asks for the interface language" width="330">
+<img src="docs/media/language.png" alt="The first run asks for the interface language" width="330">
 
 The first run asks which language to speak, and the answer is remembered. Everything switches together: the window, the notice over your game, the tray menu and the key names. The `EN` / `RU` button in the window header changes the language at any moment, even while the clicker runs.
 
