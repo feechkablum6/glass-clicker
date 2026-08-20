@@ -1,0 +1,206 @@
+/* Плашка поверх всех окон: широкая карточка на включении, потом она сжимается
+   в пилюлю и висит, пока кликер работает. Системного размытия под ней нет —
+   окно висит над играми, где акрил Windows не работает, поэтому плотность
+   держит собственный фон. */
+
+body {
+    display: grid;
+    place-items: start center;
+    padding: 12px 20px 30px;
+}
+
+.island {
+    opacity: 0;
+    transform: scale(0.92) translateY(-10px);
+    transition:
+        opacity 260ms var(--ease-soft),
+        transform 340ms var(--ease);
+}
+
+.island[data-state="wide"],
+.island[data-state="pill"] {
+    opacity: 1;
+    transform: none;
+}
+
+/* Уход: плашка не просто гаснет, а стягивается сама в себя. */
+.island[data-state="leaving"] {
+    opacity: 0;
+    transform: scale(0.9) translateY(-4px);
+    transition-duration: 240ms, 260ms;
+}
+
+.island-face {
+    position: relative;
+    width: var(--w, 300px);
+    height: var(--h, 62px);
+    border-radius: var(--r, 19px);
+    border: 1px solid var(--stroke);
+    background:
+        linear-gradient(168deg, rgba(252, 253, 254, 0.95) 0%, rgba(235, 239, 245, 0.93) 100%);
+    box-shadow:
+        0 18px 38px rgba(14, 20, 30, 0.26),
+        0 2px 6px rgba(14, 20, 30, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    overflow: hidden;
+    transition:
+        width 460ms var(--ease-morph),
+        height 460ms var(--ease-morph),
+        border-radius 460ms var(--ease-morph);
+}
+
+.island-face::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: var(--grain);
+}
+
+.island[data-state="pill"] .island-face {
+    --h: 34px;
+    --r: 999px;
+}
+
+.island[data-state="leaving"] .island-face {
+    --w: 108px;
+    --h: 28px;
+    --r: 999px;
+    transition-duration: 260ms;
+}
+
+/* Первое появление не должно приезжать из прошлого размера. */
+.island.instant .island-face {
+    transition: none;
+}
+
+/* Содержимое обоих видов лежит друг на друге по центру и кроссфейдится:
+   меняется только прозрачность и масштаб, поэтому морф идёт плавно. */
+.layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 180ms var(--ease-soft),
+        transform 320ms var(--ease-morph);
+}
+
+.layer-wide {
+    gap: 12px;
+    padding: 0 16px;
+    transform: translate(-50%, -50%) scale(0.94);
+}
+
+.layer-pill {
+    gap: 9px;
+    padding: 0 15px;
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.island[data-state="wide"] .layer-wide,
+.island[data-state="pill"] .layer-pill {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    /* Новый вид проявляется, когда форма уже почти доехала. */
+    transition-delay: 190ms;
+}
+
+.island[data-state="leaving"] .layer-wide {
+    transition-delay: 0ms;
+}
+
+/* Широкий вид */
+
+.mark {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    color: var(--ink-2);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    background: linear-gradient(158deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4));
+    box-shadow:
+        0 1px 3px rgba(14, 20, 30, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.mark svg {
+    width: 19px;
+    height: 19px;
+    transform: translate(-0.5px, -0.5px);
+}
+
+.island[data-tone="on"] .mark {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.22);
+    background: linear-gradient(158deg, var(--solid-soft), var(--solid));
+    box-shadow:
+        0 5px 14px rgba(14, 20, 30, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+.spark {
+    opacity: 0.55;
+}
+
+.island[data-tone="on"] .spark-a {
+    animation: spark 880ms steps(1, end) infinite;
+}
+
+.island[data-tone="on"] .spark-b {
+    animation: spark 880ms steps(1, end) 440ms infinite;
+}
+
+.wide-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.wide-title {
+    font-family: 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: -0.005em;
+}
+
+.wide-detail {
+    font-size: 11.5px;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Сжатый вид */
+
+.pulse {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--live);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--live) 20%, transparent);
+    animation: pulse 1.7s var(--ease-soft) infinite;
+}
+
+.pill-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes pulse {
+    50% {
+        transform: scale(0.7);
+        opacity: 0.5;
+    }
+}
