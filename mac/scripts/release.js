@@ -48,5 +48,9 @@ if (wasRunning) stopApp();
 fs.rmSync(target, { recursive: true, force: true });
 run('ditto', [source, target]);
 
+// Сборка в проекте не нужна: Spotlight находит её наравне с установленной
+// копией, и пользователь открывает случайную из двух.
+fs.rmSync(path.join(root, 'dist'), { recursive: true, force: true });
+
 console.log(`Установлено: ${target}`);
 if (wasRunning) spawn('open', [target], { detached: true, stdio: 'ignore' }).unref();

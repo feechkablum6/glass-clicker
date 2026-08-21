@@ -41,6 +41,7 @@
 ## Anti-patterns
 
 - DO NOT run the app unattended while testing: the hotkey is global, so a bound key pressed by the user starts real clicks anywhere on the desktop.
+- DO NOT leave the build in `dist` after installing: Spotlight lists it next to the copy in `/Applications` and the user opens whichever comes first. `npm run release` deletes `dist` once the install is done.
 - DO NOT start the clicker without the Accessibility permission: `CGEventPost` drops the events silently, the counter still runs, and the user sees a clicker that does nothing.
 - DO NOT read the input state with `kCGEventSourceStateCombinedSessionState`; it also reports the app's own synthetic clicks, so a mouse button hotkey would retrigger itself.
 - DO NOT quit on window close: closing hides the window into the menu bar and the clicker keeps running. Quitting happens through the menu bar item, which sets `isQuitting` before `app.quit()`.
