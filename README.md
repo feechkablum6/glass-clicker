@@ -9,6 +9,8 @@ One hotkey, up to 100 clicks per second, the click count always in sight.
 
 ![The notice over other windows: start, shrink into a pill, session result](docs/media/en/demo.gif)
 
+The same clicker for macOS lives in [mac](mac/README.md).
+
 </div>
 
 ## The notice over every window

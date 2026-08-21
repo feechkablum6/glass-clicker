@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:">
+    <title>Clicker notice</title>
+    <link rel="stylesheet" href="tokens.css">
+    <link rel="stylesheet" href="overlay.css">
+</head>
+<body>
+    <div class="island" id="island" data-state="hidden" data-tone="off" role="status" aria-live="polite">
+        <div class="island-face">
+            <div class="layer layer-wide" id="layer-wide">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path class="spark spark-a" d="M3.6 12h2.3"></path>
+                        <path class="spark spark-b" d="M12 3.6v2.3"></path>
+                        <path class="spark spark-a" d="M6.1 6.1l1.6 1.6"></path>
+                        <path class="spark spark-b" d="M17.9 6.1l-1.6 1.6"></path>
+                        <path class="spark spark-a" d="M6.1 17.9l1.6-1.6"></path>
+                        <path d="M12 12l8.8 3-3.9 1.9-1.9 3.9z"></path>
+                    </svg>
+                </span>
+                <span class="wide-text">
+                    <span class="wide-title" id="wide-title"></span>
+                    <span class="wide-detail" id="wide-detail"></span>
+                </span>
+            </div>
+
+            <div class="layer layer-pill" id="layer-pill">
+                <span class="pulse" aria-hidden="true"></span>
+                <span class="pill-text" id="pill-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="overlay.js"></script>
+</body>
+</html>

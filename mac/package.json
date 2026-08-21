@@ -1,0 +1,65 @@
+{
+  "name": "glass-clicker-mac",
+  "version": "1.0.0",
+  "description": "Autoclicker for macOS with a glass interface: hotkey, speed, click mode, English and Russian",
+  "main": "main.js",
+  "author": "AKASHI",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test \"test/*.test.js\"",
+    "icons": "electron scripts/make-icons.js",
+    "build": "electron-builder --mac",
+    "release": "node scripts/release.js"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "koffi": "^3.1.6"
+  },
+  "devDependencies": {
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.akashi.glass-clicker",
+    "productName": "Glass Clicker",
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.utilities",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ],
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "extendInfo": {
+        "LSMinimumSystemVersion": "12.0"
+      }
+    },
+    "dmg": {
+      "artifactName": "Glass-Clicker-${version}.${ext}"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "preload-overlay.js",
+      "lib/**/*",
+      "renderer/**/*",
+      "build/icon.png",
+      "build/trayTemplate.png",
+      "build/trayTemplate@2x.png"
+    ],
+    "asarUnpack": [
+      "**/*.node",
+      "**/node_modules/koffi/**",
+      "**/node_modules/@koromix/**"
+    ]
+  }
+}

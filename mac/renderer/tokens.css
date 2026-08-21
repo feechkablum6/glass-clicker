@@ -1,0 +1,70 @@
+/* Единый язык интерфейса: и окно, и плашка поверх игр берут цвета,
+   кривые и базовую типографику отсюда. */
+
+:root {
+    --ink: oklch(0.27 0.012 255);
+    --ink-2: oklch(0.46 0.012 255);
+    --ink-3: oklch(0.52 0.012 255);
+    --solid: oklch(0.26 0.014 255);
+    --solid-soft: oklch(0.33 0.014 255);
+    --live: oklch(0.66 0.15 152);
+
+    --hairline: rgba(19, 24, 33, 0.09);
+    --sunken: rgba(19, 24, 33, 0.10);
+    --glass: rgba(255, 255, 255, 0.42);
+    --glass-strong: rgba(255, 255, 255, 0.66);
+    --stroke: rgba(255, 255, 255, 0.62);
+
+    --shadow-raise: 0 10px 26px rgba(14, 20, 30, 0.14);
+    --shadow-deep: 0 18px 44px rgba(14, 20, 30, 0.30);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+    /* Смена формы: быстрый старт и долгое мягкое торможение. */
+    --ease-morph: cubic-bezier(0.32, 0.72, 0, 1);
+    --dur: 260ms;
+    --dur-fast: 160ms;
+
+    /* Мелкое зерно убирает пластиковую гладкость стеклянных плоскостей. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Искры на курсоре мигают одинаково на кнопке в окне и на плашке. */
+@keyframes spark {
+    0%, 45% {
+        opacity: 1;
+    }
+    46%, 100% {
+        opacity: 0.3;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+    }
+}
